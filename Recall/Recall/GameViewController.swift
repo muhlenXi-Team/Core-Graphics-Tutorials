@@ -133,6 +133,7 @@ private extension GameViewController {
   ) {
     patternView.direction = towards
     patternView.fillColor = color.rgba
+    patternView.setNeedsDisplay()
   }
   
   // Displays the results of the choice

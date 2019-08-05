@@ -28,44 +28,48 @@
 
 import UIKit
 
-class PatternView: UIView {
-  // MARK: - Structures
-  public struct Constants {
-    static let patternSize: CGFloat = 30.0
-    static let patternRepeatCount = 2
-  }
-  
-  // MARK: - Constants
-  enum PatternDirection: String, CaseIterable {
-    case left = "L"
-    case top = "T"
-    case right = "R"
-    case bottom = "B"
-  }
-  
-  // MARK: - Properties
-  var fillColor: [CGFloat] = [1.0, 0.0, 0.0, 1.0] {
-    didSet {
-      directionLabel.backgroundColor =
-        UIColor(red: fillColor[0], green: fillColor[1], blue: fillColor[2], alpha: fillColor[3])
-    }
-  }
-  
-  var direction: PatternDirection = .top {
-    didSet {
-      directionLabel.text = direction.rawValue
-    }
-  }
-  
-  lazy var directionLabel: UILabel = {
-    let directionLabel =
-      UILabel(frame: CGRect(x: 2, y: 2, width: Constants.patternSize, height: Constants.patternSize))
-    directionLabel.text = direction.rawValue
-    directionLabel.textColor = .white
-    return directionLabel
-  }()
+public struct Constants {
+  static let patternSize: CGFloat = 30.0
+  static let patternRepeatCount = 2
+}
 
-  // MARK: - Initialization
+extension UIBezierPath {
+  convenience init(triangleIn rect: CGRect) {
+    self.init()
+    
+    let topOfTriangle = CGPoint(x: rect.width/2, y: 0)
+    let bottomLeftOfTriangle = CGPoint(x: 0, y: rect.height)
+    let bottomRightOfTriangle = CGPoint(x: rect.width, y: rect.height)
+    
+    self.move(to: topOfTriangle)
+    self.addLine(to: bottomLeftOfTriangle)
+    self.addLine(to: bottomRightOfTriangle)
+    
+    self.close()
+  }
+}
+
+class PatternView: UIView {
+  
+  enum PatternDirection: CaseIterable {
+    case left
+    case top
+    case right
+    case bottom
+  }
+  
+  var fillColor: [CGFloat] = [1.0, 0.0, 0.0, 1.0]
+  var direction: PatternDirection = .top
+  
+  let drawTriangle: CGPatternDrawPatternCallback = { _, context in
+    let trianglePath = UIBezierPath(triangleIn:
+      CGRect(x: 0, y: 0,
+             width: Constants.patternSize,
+             height: Constants.patternSize))
+    context.addPath(trianglePath.cgPath)
+    context.fillPath()
+  }
+  
   init(fillColor: [CGFloat], direction: PatternDirection = .top) {
     self.fillColor = fillColor
     self.direction = direction
@@ -74,15 +78,46 @@ class PatternView: UIView {
   
   required init?(coder aDecoder: NSCoder) {
     super.init(coder: aDecoder)
-    setupView()
   }
   
-  override init(frame: CGRect) {
-    super.init(frame: frame)
-    setupView()
-  }
-
-  private func setupView() {
-    addSubview(directionLabel)
+  override func draw(_ rect: CGRect) {
+    let context = UIGraphicsGetCurrentContext()!
+    UIColor.white.setFill()
+    context.fill(rect)
+    
+    var callbacks = CGPatternCallbacks(version: 0, drawPattern: drawTriangle, releaseInfo: nil)
+    let patternStepX: CGFloat = rect.width / CGFloat(Constants.patternRepeatCount)
+    let patternStepY: CGFloat = rect.height / CGFloat(Constants.patternRepeatCount)
+    let patternOffsetX: CGFloat = (patternStepX - Constants.patternSize) / 2.0
+    let patternOffsetY: CGFloat = (patternStepY - Constants.patternSize) / 2.0
+    
+    var transform: CGAffineTransform
+    switch direction {
+    case .top:
+      transform = .identity
+    case .right:
+      transform = CGAffineTransform(rotationAngle: CGFloat(0.5 * .pi))
+    case .bottom:
+      transform = CGAffineTransform(rotationAngle: CGFloat(1.0 * .pi))
+    case .left:
+      transform = CGAffineTransform(rotationAngle: CGFloat(1.5 * .pi))
+    }
+    transform = transform.translatedBy(x: patternOffsetX, y: patternOffsetY)
+    
+    let pattern = CGPattern(info: nil,
+                            bounds: CGRect(x: 0, y: 0, width: 20, height: 20),
+                            matrix: transform,
+                            xStep: patternStepX,
+                            yStep: patternStepY,
+                            tiling: .constantSpacing,
+                            isColored: false,
+                            callbacks: &callbacks)
+    
+    let baseSpace = CGColorSpaceCreateDeviceRGB()
+    let patternSpace = CGColorSpace(patternBaseSpace: baseSpace)!
+    context.setFillColorSpace(patternSpace)
+    
+    context.setFillPattern(pattern!, colorComponents: fillColor)
+    context.fill(rect)
   }
 }

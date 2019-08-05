@@ -1,6 +1,6 @@
-# Drink
+# Core Graphics Tutorial
 
-Core Graphics Tutorial
+## Drink
 
 - UIBezierPath 绘制圆形
 - UIBezierPath 绘制直线
@@ -11,3 +11,8 @@ Core Graphics Tutorial
 - UIGraphicsBeginImageContextWithOptions 绘制图片
 - UIGraphicsGetCurrentContext 绘制文字
 - UIGraphicsGetCurrentContext transform、rotate、shadow
+
+
+## Recall
+
+- Create Patterns
