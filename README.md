@@ -1,5 +1,12 @@
 # Core Graphics Tutorial
 
+## StarWarsTopTrumps
+
+- CGContext 绘制矩形
+- CGContext 绘制直线
+- CGContext 绘制渐变
+- CGContext 图形剪切 
+
 ## Drink
 
 - UIBezierPath 绘制圆形
@@ -7,12 +14,12 @@
 - UIBezierPath 绘制弧度
 - UIBezierPath 裁剪
 
-- UIGraphicsGetCurrentContext 绘制线性渐变
+- CGContext 绘制线性渐变
 - UIGraphicsBeginImageContextWithOptions 绘制图片
-- UIGraphicsGetCurrentContext 绘制文字
-- UIGraphicsGetCurrentContext transform、rotate、shadow
+- CGContext 绘制文字
+- CGContext transform、rotate、shadow
 
 
 ## Recall
 
-- Create Patterns
+- Create Patterns 样式填充
