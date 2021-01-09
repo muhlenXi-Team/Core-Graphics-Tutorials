@@ -7,6 +7,12 @@
 - CGContext 绘制渐变
 - CGContext 图形剪切 
 
+## LearningAgenda
+
+- CGContext 绘制弧线
+- CGContext 绘制阴影
+- CGContext 绘制渐变
+
 ## Drink
 
 - UIBezierPath 绘制圆形
